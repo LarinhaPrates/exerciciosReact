@@ -1,3 +1,26 @@
 @import 'tailwindcss';
 
+/* Garantir que o app possa preencher toda a tela */
+html, body, #root {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+/* Caso precise de uma regra base para body */
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* Header padrão da aplicação: mesma altura em todas as páginas */
+.app-header {
+	height: 80px;            /* ~h-20 */
+	display: flex;           /* flex */
+	align-items: center;     /* items-center */
+	justify-content: space-between; /* justify-between */
+	padding-left: 2rem;      /* px-8 */
+	padding-right: 2rem;
+}
+
 
