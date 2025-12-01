@@ -86,7 +86,7 @@ function AdicionarProdutos() {
       // Upload robusto: tenta múltiplos buckets e caminhos
       if (formData.imagem) {
         const file = formData.imagem;
-        
+
         // Verificar se usuário está autenticado
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         if (authError || !user) {
@@ -94,29 +94,26 @@ function AdicionarProdutos() {
           setSalvando(false);
           return;
         }
-        
+
         const extensao = (file.name.split('.').pop() || 'jpg').toLowerCase();
         const timestamp = Date.now();
         const random = Math.random().toString(36).substring(2, 8);
         const nomeArquivo = `produto-${timestamp}-${random}.${extensao}`;
-        
-        // Tentar diferentes buckets e caminhos
+
+        // Tentar diferentes caminhos no bucket Fotos
         const tentativas = [
-          { bucket: 'produtos', path: nomeArquivo },
-          { bucket: 'produtos', path: `fotos/${nomeArquivo}` },
-          { bucket: 'public', path: nomeArquivo },
-          { bucket: 'public', path: `Fotos/${nomeArquivo}` },
-          { bucket: 'public', path: `fotos/${nomeArquivo}` },
           { bucket: 'Fotos', path: nomeArquivo },
+          { bucket: 'Fotos', path: `fotos/${nomeArquivo}` },
+          { bucket: 'Fotos', path: `produtos/${nomeArquivo}` },
         ];
-        
+
         let uploadSucesso = false;
         let ultimoErro = null;
-        
+
         for (const tentativa of tentativas) {
           try {
             console.log(`Tentando upload no bucket '${tentativa.bucket}', caminho: '${tentativa.path}'`);
-            
+
             const { data: uploadData, error: upErr } = await supabase.storage
               .from(tentativa.bucket)
               .upload(tentativa.path, file, {
@@ -124,20 +121,20 @@ function AdicionarProdutos() {
                 upsert: true,
                 contentType: file.type || 'image/jpeg',
               });
-            
+
             if (upErr) {
               console.warn(`Erro no bucket '${tentativa.bucket}':`, upErr.message);
               ultimoErro = upErr;
               continue;
             }
-            
+
             console.log('Upload bem-sucedido:', uploadData);
-            
+
             // Obter URL pública
             const { data: urlData } = supabase.storage
               .from(tentativa.bucket)
               .getPublicUrl(tentativa.path);
-            
+
             if (urlData && urlData.publicUrl) {
               imagemUrl = urlData.publicUrl;
               uploadSucesso = true;
@@ -150,7 +147,7 @@ function AdicionarProdutos() {
             continue;
           }
         }
-        
+
         if (!uploadSucesso) {
           const erroMsg = ultimoErro?.message || 'Erro desconhecido';
           console.error('Todas as tentativas de upload falharam. Último erro:', erroMsg);
@@ -182,7 +179,7 @@ function AdicionarProdutos() {
         // Reset do input file
         const fileInput = document.getElementById('imagem');
         if (fileInput) fileInput.value = '';
-        
+
         setSucesso('Produto adicionado com sucesso! Você pode adicionar outro ou voltar.');
       }
     } catch (ex) {
@@ -213,16 +210,16 @@ function AdicionarProdutos() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-  <header className="bg-[#004d9d] text-white app-header">
+      <header className="bg-[#004d9d] text-white app-header">
         <div className="flex items-center gap-4">
           <div className="border-2 border-white rounded-full p-2 w-12 h-12 flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
             </svg>
           </div>
           <span className="font-semibold">{carregandoUser ? 'Carregando...' : (userNome || 'USUÁRIO')}</span>
         </div>
-        
+
         <nav className="flex gap-8">
           <a href="/GerenciarProdutosSesc" className="hover:underline">PRODUTOS</a>
           <a href="/GerenciarPedidos" className="hover:underline">PEDIDOS</a>
@@ -291,8 +288,8 @@ function AdicionarProdutos() {
                 Imagem
               </label>
               <div className="w-full px-4 py-3 border border-gray-300 rounded-lg">
-                <label 
-                  htmlFor="imagem" 
+                <label
+                  htmlFor="imagem"
                   className="cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-6 rounded-lg inline-block transition-colors"
                 >
                   Upload Arquivos
