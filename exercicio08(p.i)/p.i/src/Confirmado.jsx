@@ -51,7 +51,7 @@ function PedidoConfirmado() {
 
                     {/* Botão voltar */}
                     <a
-                        href="/Escolhe"
+                        href="./Escolhe"
                         className="bg-[#4b9c69] text-white font-semibold px-8 py-3 rounded-lg shadow hover:bg-[#3c8056] transition-all duration-300"
                     >
                         Voltar
