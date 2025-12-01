@@ -52,13 +52,15 @@ function Cadastrar() {
             }
 
             // Inserir perfil associado (tratando possíveis falhas de RLS)
+            let tipoConta = 'aluno'; // Padrão
             try {
                 const { error: perfilError } = await supabase
                     .from('perfil')
                     .insert({
                         id_user: userId,
                         nome: nome,
-                        tipoConta: 'aluno',
+                        email: email,
+                        tipoConta: tipoConta,
                     });
                 if (perfilError) {
                     // Loga mas não bloqueia fluxo de cadastro básico
@@ -70,12 +72,29 @@ function Cadastrar() {
                 console.warn('Exceção ao inserir perfil:', eInserir);
             }
 
+            // Buscar o tipoConta do perfil criado para redirecionar corretamente
+            try {
+                const { data: perfilData } = await supabase
+                    .from('perfil')
+                    .select('tipoConta')
+                    .eq('id_user', userId)
+                    .maybeSingle();
+                
+                if (perfilData && perfilData.tipoConta) {
+                    tipoConta = perfilData.tipoConta;
+                }
+            } catch (eBuscar) {
+                console.warn('Erro ao buscar tipoConta:', eBuscar);
+            }
+
             setSucesso(
-                'Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta, se necessário.'
+                'Cadastro realizado com sucesso! Redirecionando para o login...'
             );
 
-            // Redireciona após pequeno atraso
-            setTimeout(() => navigate('/'), 1200);
+            // Redireciona para a página de login após cadastro
+            setTimeout(() => {
+                navigate('/');
+            }, 1500);
         } catch (err) {
             setErro('Erro inesperado ao cadastrar. Tente novamente.');
         } finally {
@@ -165,13 +184,14 @@ function Cadastrar() {
                     >
                         {loading ? "Cadastrando..." : "Cadastrar"}
                     </button>
-                    <button
-                        type="button"
-                        onClick={voltar}
-                        className="bg-white w-30 h-10 text-[#FFDD7A] text-sm rounded-full px-4 py-0.5 mt-1 border border-orange-300 hover:bg-orange-50 transition"
-                    >
-                        Voltar
-                    </button>
+                    <Link to="/">
+                        <button
+                            type="button"
+                            className="bg-white w-30 h-10 text-[#FFDD7A] text-sm rounded-full px-4 py-0.5 mt-1 border border-orange-300 hover:bg-orange-50 transition"
+                        >
+                            Voltar
+                        </button>
+                    </Link>
                 </form>
             </div>
         </div>

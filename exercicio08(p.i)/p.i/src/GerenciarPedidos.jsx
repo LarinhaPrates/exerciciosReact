@@ -69,28 +69,64 @@ function GerenciarPedidos() {
       setErro('');
       setCarregando(true);
       try {
-        // Seleciona com possíveis variações de PK
+        // Primeiro, buscar todos os pedidos
         const { data, error } = await supabase
           .from('pedido')
           .select('id_pedido, id_user_cliente, itens, status_pedido, created_at')
           .order('created_at', { ascending: false });
-          console.log(data)
+          
         if (error) {
           console.error('Erro ao carregar pedidos:', error.message);
           setErro('Falha ao carregar pedidos.');
           setPedidos([]);
           return;
         }
+        
         const rows = data || [];
+        
+        // Buscar os nomes dos alunos para cada pedido
+        const idsUnicos = [...new Set(rows.map(r => r.id_user_cliente).filter(Boolean))];
+        const perfisMap = {};
+        
+        if (idsUnicos.length > 0) {
+          // Tentar buscar perfis por id_user (UUID do auth)
+          const { data: perfisData } = await supabase
+            .from('perfil')
+            .select('id_user, nome, email')
+            .in('id_user', idsUnicos);
+            
+          if (perfisData && perfisData.length > 0) {
+            perfisData.forEach(p => {
+              perfisMap[p.id_user] = p.nome;
+            });
+          }
+          
+          // Se não encontrou nada, buscar por email (caso id_user_cliente seja email)
+          if (perfisData && perfisData.length === 0) {
+            const { data: perfilsPorEmail } = await supabase
+              .from('perfil')
+              .select('email, nome')
+              .in('email', idsUnicos);
+            
+            if (perfilsPorEmail && perfilsPorEmail.length > 0) {
+              perfilsPorEmail.forEach(p => {
+                perfisMap[p.email] = p.nome;
+              });
+            }
+          }
+          
+        }
+        
         const mapeados = rows.map((r, idx) => ({
           id: r.id_pedido ?? idx,
           numero: String(r.id_pedido ?? idx).padStart(3, '0'),
-          aluno: r.id_user_cliente || '-',
+          aluno: perfisMap[r.id_user_cliente] || 'Usuário sem cadastro',
           produtos: itensParaTexto(r.itens),
           rawItens: r.itens,
           status: r.status_pedido || '-',
           dataHora: formatarDataHora(r.created_at),
         }));
+        
         setPedidos(mapeados);
       } catch (ex) {
         console.error('Exceção ao carregar pedidos:', ex);
@@ -135,9 +171,13 @@ function GerenciarPedidos() {
 
   const filtrarPedidos = () => {
     if (filtroAtivo === 'todos') return pedidos;
-    const statusLc = (s) => (s || '').toLowerCase();
+    const statusLc = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
     if (filtroAtivo === 'emAndamento') return pedidos.filter(p => statusLc(p.status).includes('andament'));
-    if (filtroAtivo === 'Pendente') return pedidos.filter(p => statusLc(p.status).includes('pend'));
+    if (filtroAtivo === 'Pendente') return pedidos.filter(p => 
+      statusLc(p.status).includes('pend') || 
+      statusLc(p.status).includes('esperando') ||
+      statusLc(p.status).includes('pagamento')
+    );
     if (filtroAtivo === 'concluidos') return pedidos.filter(p => statusLc(p.status).includes('conclu'));
     if (filtroAtivo === 'cancelados') return pedidos.filter(p => statusLc(p.status).includes('cancel'));
     return pedidos;
@@ -150,6 +190,7 @@ function GerenciarPedidos() {
     let s = (status || '').trim().toLowerCase();
     s = s.normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
+    if (s.includes('esperando') || s.includes('pagamento')) return 'bg-yellow-300 text-yellow-900'; // Esperando Pagamento
     if (s.includes('pend')) return 'bg-yellow-300 text-yellow-900';      // Pendente
     if (s.includes('andament')) return 'bg-blue-500 text-white';          // Em Andamento
     if (s.includes('conclu')) return 'bg-green-600 text-white';           // Concluido/Concluído
@@ -215,7 +256,7 @@ function GerenciarPedidos() {
                   : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
               }`}
             >
-              Pendente
+              Esperando Pagamento
             </button>
             <button
               onClick={() => setFiltroAtivo('concluidos')}

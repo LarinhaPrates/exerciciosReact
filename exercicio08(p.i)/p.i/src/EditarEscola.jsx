@@ -47,7 +47,7 @@ function EditarEscola() {
         (data || []).forEach(row => {
           if (!row.id_user || vistos.has(row.id_user)) return;
           vistos.add(row.id_user);
-          const display = row.nome || row.nome_completo || row.username || (row.email ? row.email.split('@')[0] : row.id_user.slice(0,8));
+          const display = row.nome || row.nome_completo || row.username || (row.email ? row.email.split('@')[0] : row.id_user.slice(0, 8));
           normalizados.push({ id: row.id_user, display });
         });
 
@@ -119,7 +119,7 @@ function EditarEscola() {
         } else {
           // Fallback para user_metadata ou email
           const meta = user.user_metadata || {};
-            const nomeDisplay = meta.nome || meta.nome_completo || meta.username || (user.email ? user.email.split('@')[0] : 'Usuário');
+          const nomeDisplay = meta.nome || meta.nome_completo || meta.username || (user.email ? user.email.split('@')[0] : 'Usuário');
           setUserNome(nomeDisplay);
         }
       } catch (e) {
@@ -194,16 +194,16 @@ function EditarEscola() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-  <header className="bg-[#004d9d] text-white app-header">
+      <header className="bg-[#004d9d] text-white app-header">
         <div className="flex items-center gap-4">
           <div className="border-2 border-white rounded-full p-2 w-12 h-12 flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
             </svg>
           </div>
           <span className="font-semibold">{carregandoUserNome ? '...' : (userNome || 'Usuário')}</span>
         </div>
-        
+
         <nav className="flex gap-8">
           <Link to="/GerenciarEscolas" className="hover:underline ">ESCOLA</Link>
           <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
@@ -275,6 +275,24 @@ function EditarEscola() {
                 <option value="salvador">Salvador</option>
                 <option value="fortaleza">Fortaleza</option>
                 <option value="recife">Recife</option>
+                <option value="manaus">Manaus</option>
+                <option value="belem">Belém</option>
+                <option value="goiania">Goiânia</option>
+                <option value="cuiaba">Cuiabá</option>
+                <option value="campo-grande">Campo Grande</option>
+                <option value="palmas">Palmas</option>
+                <option value="maceio">Maceió</option>
+                <option value="aracaju">Aracaju</option>
+                <option value="joao-pessoa">João Pessoa</option>
+                <option value="natal">Natal</option>
+                <option value="teresina">Teresina</option>
+                <option value="florianopolis">Florianópolis</option>
+                <option value="vitoria">Vitória</option>
+                <option value="porto-velho">Porto Velho</option>
+                <option value="rio-branco">Rio Branco</option>
+                <option value="macapa">Macapá</option>
+                <option value="boa-vista">Boa Vista</option>
+
               </select>
             </div>
 

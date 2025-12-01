@@ -60,7 +60,7 @@ function App() {
         } else if (tcLower === 'adm') {
           navigate('/EscolhaAdm');
         } else {
-          navigate('/EscolheAdm');
+          navigate('/Escolhe');
         }
       } else {
         // Sem tipo definido cai no fluxo padrão de usuário comum

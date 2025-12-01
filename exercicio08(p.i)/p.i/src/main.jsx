@@ -31,6 +31,7 @@ import GerenciarPedidos from './GerenciarPedidos.jsx'
 import AdicionarProdutos from './AdicionarProdutosSesc.jsx'
 import AdicionarProdutosSenac from './AdicionarProdutosSenac.jsx'
 import GerenciarAlunos from './GerenciarAlunos.jsx'
+import EditarAluno from './EditarAluno.jsx'
 import ItensPedido from './ItensPedido.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -71,6 +72,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/AdicionarProdutosSesc" element={<AdicionarProdutos />} />
           <Route path="/AdicionarProdutosSenac" element={<AdicionarProdutosSenac />} />
           <Route path="/GerenciarAlunos" element={<GerenciarAlunos />} />
+          <Route path="/EditarAluno/:id" element={<EditarAluno />} />
           <Route path="/ItensPedido/:id" element={<ItensPedido />} />
         </Routes>
       </BrowserRouter>

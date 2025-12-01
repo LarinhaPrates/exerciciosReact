@@ -1,10 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 
 function GerenciarAlunos() {
+  const navigate = useNavigate();
   const [alunos, setAlunos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -27,6 +28,23 @@ function GerenciarAlunos() {
         } else {
           const perfis = data || [];
           const userIds = perfis.map((p) => p.id_user).filter(Boolean);
+          
+          // Buscar nomes das escolas
+          const escolaIds = [...new Set(perfis.map(p => p.id_escola).filter(Boolean))];
+          let escolasMap = {};
+          
+          if (escolaIds.length > 0) {
+            const { data: escolasData } = await supabase
+              .from('escola')
+              .select('id_escola, nome_escola')
+              .in('id_escola', escolaIds);
+            
+            if (escolasData) {
+              escolasData.forEach(escola => {
+                escolasMap[escola.id_escola] = escola.nome_escola;
+              });
+            }
+          }
 
           // Mapa de contagem de pedidos por usuário (com fallback de coluna)
           let pedidosCountMap = {};
@@ -68,7 +86,7 @@ function GerenciarAlunos() {
           const mapeados = perfis.map((p) => ({
             id: p.id_user,
             nome: p.nome || '-',
-            id_escola: p.id_escola ?? '-',
+            escola: escolasMap[p.id_escola] || 'Sem escola',
             pedidosFeitos: pedidosCountMap[p.id_user] || 0,
             status: 'Ativo',
           }));
@@ -116,11 +134,7 @@ function GerenciarAlunos() {
   }, []);
 
   const handleEdit = (id) => {
-    // Aqui você pode redirecionar para uma página de edição ou abrir um modal
-    console.log('Editar aluno com ID:', id);
-    const aluno = alunos.find(a => a.id === id);
-    alert(`Editar aluno: ${aluno.nome}`);
-    // window.location.href = `/editar-aluno/${id}`;
+    navigate(`/EditarAluno/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -225,7 +239,7 @@ function GerenciarAlunos() {
                     className={`border-b-2 border-[#004d9d] ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                   >
                     <td className="py-4 px-6 text-gray-800">{aluno.nome}</td>
-                    <td className="py-4 px-6 text-gray-800 border-l-2 border-[#004d9d]">{aluno.id_escola}</td>
+                    <td className="py-4 px-6 text-gray-800 border-l-2 border-[#004d9d]">{aluno.escola}</td>
                     <td className="py-4 px-6 text-gray-800 border-l-2 border-[#004d9d]">{aluno.pedidosFeitos}</td>
                     <td className={`py-4 px-6 border-l-2 border-[#004d9d] ${
                       aluno.status === 'Ativo' ? 'text-green-600' : 'text-red-600'
@@ -234,6 +248,16 @@ function GerenciarAlunos() {
                     </td>
                     <td className="py-4 px-6 border-l-2 border-[#004d9d]">
                       <div className="flex justify-center gap-4">
+                        {/* Botão Editar */}
+                        <button
+                          onClick={() => handleEdit(aluno.id)}
+                          className="text-gray-600 hover:text-[#004d9d] transition-colors"
+                          title="Editar"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
                         {/* Botão Excluir */}
                         <button
                           onClick={() => handleDelete(aluno.id)}
