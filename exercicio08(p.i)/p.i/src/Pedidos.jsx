@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { useCarrinho } from "./CarrinhoContext";
 import { supabase } from "../lib/supabase.js";
@@ -55,7 +56,7 @@ function Pedidos() {
 
                 <nav className="flex gap-12 text-lg">
                     <button className="hover:underline">PEDIDOS</button>
-                    <a href="/Pagamento" className="hover:underline">CONTA</a>
+                    <Link to="/Pagamento" className="hover:underline">CONTA</Link>
                     <button
                         onClick={handleVoltar}
                         className="hover:underline"

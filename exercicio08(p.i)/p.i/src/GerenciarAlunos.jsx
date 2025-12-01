@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
@@ -176,9 +177,9 @@ function GerenciarAlunos() {
         </div>
         
         <nav className="flex gap-8">
-          <a href="/EscolhaAdm" className="hover:underline">ESCOLHA</a>
-          <a href="/GerenciarPedidos" className="hover:underline">PEDIDOS</a>
-          <a href="/GerenciarAlunos" className="hover:underline">ALUNOS</a>
+          <Link to="/EscolhaAdm" className="hover:underline">ESCOLHA</Link>
+          <Link to="/GerenciarPedidos" className="hover:underline">PEDIDOS</Link>
+          <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
@@ -187,10 +188,10 @@ function EditarLanchonete() {
         </div>
         
         <nav className="flex gap-8">
-          <a href="/GerenciarEscolas" className="hover:underline">ESCOLA</a>
-          <a href="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</a>
-          <a href="/GerenciarLanchonete" className="hover:underline ">LANCHONETES</a>
-          <a href="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</a>
+          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+          <Link to="/GerenciarLanchonete" className="hover:underline ">LANCHONETES</Link>
+          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
         </nav>
 
         <div className="flex gap-4">
