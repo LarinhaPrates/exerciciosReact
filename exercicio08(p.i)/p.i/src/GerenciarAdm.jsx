@@ -1,10 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
 
 function GerenciarAdm() {
+  const navigate = useNavigate();
   const [administradores, setAdministradores] = useState([]); // carregados da tabela perfil
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
@@ -83,8 +84,7 @@ function GerenciarAdm() {
   }, []);
 
   const handleEdit = (id) => {
-    // Navega para a rota de edição com id do usuário
-    window.location.href = `/EditarAdm/${id}`;
+    navigate(`/EditarAdm/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -118,8 +118,7 @@ function GerenciarAdm() {
   };
 
   const handleCadastrar = () => {
-    // Redirecionar para a página de cadastro
-    window.location.href = '/CadastrarAdm';
+    navigate('/CadastrarAdm');
   };
 
   return (

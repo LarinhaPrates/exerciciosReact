@@ -124,8 +124,7 @@ function GerenciarEscolas() {
   };
 
   const handleCriarEscola = () => {
-    // Redirecionar para a página de criação de escola
-    window.location.href = '/CriarEscola';
+    navigate('/CriarEscola');
   };
 
   return (
