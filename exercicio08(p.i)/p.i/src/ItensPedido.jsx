@@ -4,17 +4,91 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
+import { useToast } from './ToastContext';
+import ConfirmDialog from './ConfirmDialog';
 
 function ItensPedido() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { id } = useParams();
+	const toast = useToast();
 	const [usuarioNome, setUsuarioNome] = useState('');
 	const [itens, setItens] = useState([]);
+	const [atualizandoStatus, setAtualizandoStatus] = useState(false);
+	const [showConfirmPagamento, setShowConfirmPagamento] = useState(false);
+	const [showConfirmCancelamento, setShowConfirmCancelamento] = useState(false);
 	const numeroPedido = location.state?.numero || id;
 
 	const formatCurrency = (valor) =>
 		new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
+
+	// Função para confirmar pagamento
+	const confirmarPagamento = async () => {
+		if (!id) {
+			toast.error('ID do pedido não encontrado');
+			return;
+		}
+		if (atualizandoStatus) return;
+
+		const idNumero = parseInt(id, 10);
+		setAtualizandoStatus(true);
+		
+		try {
+			const { data, error } = await supabase
+				.from('pedido')
+				.update({ status_pedido: 'Concluídos' })
+				.eq('id_pedido', idNumero)
+				.select();
+
+			if (error) throw error;
+
+			if (!data || data.length === 0) {
+				toast.error('Não foi possível atualizar o pedido');
+				return;
+			}
+
+			toast.success('Pagamento confirmado com sucesso!');
+			setTimeout(() => navigate('/GerenciarPedidos'), 1500);
+		} catch (err) {
+			toast.error(`Erro ao confirmar pagamento: ${err.message}`);
+		} finally {
+			setAtualizandoStatus(false);
+		}
+	};
+
+	// Função para cancelar pedido
+	const cancelarPedido = async () => {
+		if (!id) {
+			toast.error('ID do pedido não encontrado');
+			return;
+		}
+		if (atualizandoStatus) return;
+
+		const idNumero = parseInt(id, 10);
+		setAtualizandoStatus(true);
+		
+		try {
+			const { data, error } = await supabase
+				.from('pedido')
+				.update({ status_pedido: 'Cancelados' })
+				.eq('id_pedido', idNumero)
+				.select();
+
+			if (error) throw error;
+
+			if (!data || data.length === 0) {
+				toast.error('Não foi possível atualizar o pedido');
+				return;
+			}
+
+			toast.success('Pedido cancelado com sucesso!');
+			setTimeout(() => navigate('/GerenciarPedidos'), 1500);
+		} catch (err) {
+			toast.error(`Erro ao cancelar pedido: ${err.message}`);
+		} finally {
+			setAtualizandoStatus(false);
+		}
+	};
 
 	useEffect(() => {
 		let isMounted = true;
@@ -231,7 +305,79 @@ function ItensPedido() {
 						</tbody>
 					</table>
 				</div>
+
+				{/* Botões de Ação */}
+				<div className="flex justify-center gap-4 mt-8">
+					<button
+						onClick={() => setShowConfirmPagamento(true)}
+						disabled={atualizandoStatus}
+						className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+					>
+						{atualizandoStatus ? (
+							<>
+								<svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+									<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+								Processando...
+							</>
+						) : (
+							<>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+								</svg>
+								Confirmar Pagamento
+							</>
+						)}
+					</button>
+
+					<button
+						onClick={() => setShowConfirmCancelamento(true)}
+						disabled={atualizandoStatus}
+						className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+					>
+						{atualizandoStatus ? (
+							<>
+								<svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+									<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+								</svg>
+								Processando...
+							</>
+						) : (
+							<>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+								</svg>
+								Cancelar Pedido
+							</>
+						)}
+					</button>
+				</div>
 			</div>
+
+			{/* Modais de Confirmação */}
+			<ConfirmDialog
+				isOpen={showConfirmPagamento}
+				onClose={() => setShowConfirmPagamento(false)}
+				onConfirm={confirmarPagamento}
+				title="Confirmar Pagamento"
+				message="Você confirma o pagamento deste pedido? Esta ação alterará o status para Concluído."
+				confirmText="Sim, Confirmar"
+				cancelText="Cancelar"
+				type="success"
+			/>
+
+			<ConfirmDialog
+				isOpen={showConfirmCancelamento}
+				onClose={() => setShowConfirmCancelamento(false)}
+				onConfirm={cancelarPedido}
+				title="Cancelar Pedido"
+				message="Tem certeza que deseja cancelar este pedido? Esta ação não pode ser desfeita."
+				confirmText="Sim, Cancelar"
+				cancelText="Não"
+				type="danger"
+			/>
 		</div>
 	);
 }
