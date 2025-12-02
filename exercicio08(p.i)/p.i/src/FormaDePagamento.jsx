@@ -39,6 +39,18 @@ function FormaDePagamento() {
     const handleFinalizar = async () => {
         if (!metodoPagamento || carrinho.length === 0 || salvando) return;
         setErroSalvar("");
+        
+        // Validar se todos os produtos são da mesma lanchonete
+        const lanchonetes = [...new Set(carrinho.map(item => item.id_lanchonete).filter(Boolean))];
+        if (lanchonetes.length > 1) {
+            setErroSalvar('Erro: O carrinho contém produtos de diferentes lanchonetes. Por favor, escolha produtos de apenas uma lanchonete.');
+            return;
+        }
+        if (lanchonetes.length === 0) {
+            setErroSalvar('Erro: Nenhum produto no carrinho possui lanchonete associada.');
+            return;
+        }
+        
         setSalvando(true);
         try {
             const TABLE_PEDIDOS = import.meta.env.VITE_TB_PEDIDOS || 'pedido';
@@ -100,9 +112,13 @@ function FormaDePagamento() {
             const itensStr = JSON.stringify(itensArray);
             const total = Number(calcularTotal().toFixed(2));
 
+            // Obter id_lanchonete do primeiro item do carrinho
+            const idLanchonete = carrinho.length > 0 ? carrinho[0].id_lanchonete : null;
+
             const payload = {
                 id_escola: idEscola,          // Conforme solicitado: vindo do perfil
                 id_user_cliente: user.id,     // FK para auth.users
+                id_lanchonete: idLanchonete,  // FK para tabela lanchonete
                 status_pedido: 'Esperando Pagamento',
                 valor_total: total,
                 itens: itensStr,

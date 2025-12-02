@@ -10,6 +10,8 @@ function GerenciarPedidos() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
   const [usuarioNome, setUsuarioNome] = useState('');
+  const [lanchonetes, setLanchonetes] = useState([]);
+  const [lanchonetesSelecionada, setLanchoneteSelecionada] = useState('todas');
 
   // Formata data/hora para pt-BR
   const formatarDataHora = (iso) => {
@@ -63,16 +65,35 @@ function GerenciarPedidos() {
     }
   };
 
+  // Carregar lanchonetes
+  useEffect(() => {
+    const carregarLanchonetes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('lanchonete')
+          .select('id_lanchonete, nome_lanchonete')
+          .order('nome_lanchonete', { ascending: true });
+        
+        if (!error && data) {
+          setLanchonetes(data);
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar lanchonetes:', err);
+      }
+    };
+    carregarLanchonetes();
+  }, []);
+
   // Carregar pedidos do Supabase
   useEffect(() => {
     const carregarPedidos = async () => {
       setErro('');
       setCarregando(true);
       try {
-        // Primeiro, buscar todos os pedidos
+        // Primeiro, buscar todos os pedidos (incluindo id_lanchonete se existir)
         const { data, error } = await supabase
           .from('pedido')
-          .select('id_pedido, id_user_cliente, itens, status_pedido, created_at')
+          .select('id_pedido, id_user_cliente, itens, status_pedido, created_at, id_lanchonete')
           .order('created_at', { ascending: false });
           
         if (error) {
@@ -125,6 +146,7 @@ function GerenciarPedidos() {
           rawItens: r.itens,
           status: r.status_pedido || '-',
           dataHora: formatarDataHora(r.created_at),
+          idLanchonete: r.id_lanchonete,
         }));
         
         setPedidos(mapeados);
@@ -170,17 +192,28 @@ function GerenciarPedidos() {
   }, []);
 
   const filtrarPedidos = () => {
-    if (filtroAtivo === 'todos') return pedidos;
-    const statusLc = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
-    if (filtroAtivo === 'emAndamento') return pedidos.filter(p => statusLc(p.status).includes('andament'));
-    if (filtroAtivo === 'Pendente') return pedidos.filter(p => 
-      statusLc(p.status).includes('pend') || 
-      statusLc(p.status).includes('esperando') ||
-      statusLc(p.status).includes('pagamento')
-    );
-    if (filtroAtivo === 'concluidos') return pedidos.filter(p => statusLc(p.status).includes('conclu'));
-    if (filtroAtivo === 'cancelados') return pedidos.filter(p => statusLc(p.status).includes('cancel'));
-    return pedidos;
+    let resultado = pedidos;
+
+    // Filtrar por status
+    if (filtroAtivo !== 'todos') {
+      const statusLc = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+      if (filtroAtivo === 'emAndamento') resultado = resultado.filter(p => statusLc(p.status).includes('andament'));
+      else if (filtroAtivo === 'Pendente') resultado = resultado.filter(p => 
+        statusLc(p.status).includes('pend') || 
+        statusLc(p.status).includes('esperando') ||
+        statusLc(p.status).includes('pagamento')
+      );
+      else if (filtroAtivo === 'concluidos') resultado = resultado.filter(p => statusLc(p.status).includes('conclu'));
+      else if (filtroAtivo === 'cancelados') resultado = resultado.filter(p => statusLc(p.status).includes('cancel'));
+    }
+
+    // Filtrar por lanchonete
+    if (lanchonetesSelecionada !== 'todas') {
+      const idLanchonete = parseInt(lanchonetesSelecionada, 10);
+      resultado = resultado.filter(p => p.idLanchonete === idLanchonete);
+    }
+
+    return resultado;
   };
 
   const pedidosFiltrados = filtrarPedidos();
@@ -235,7 +268,29 @@ function GerenciarPedidos() {
             <div className="text-center text-gray-600 mb-4">Carregando pedidos...</div>
           )}
 
-          {/* Botões de Filtro */}
+          {/* Filtro por Lanchonete */}
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center gap-3">
+              <label htmlFor="filtroLanchonete" className="text-lg font-semibold text-[#004d9d]">
+                Filtrar por Lanchonete:
+              </label>
+              <select
+                id="filtroLanchonete"
+                value={lanchonetesSelecionada}
+                onChange={(e) => setLanchoneteSelecionada(e.target.value)}
+                className="px-4 py-2 border-2 border-[#004d9d] rounded-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#004d9d] bg-white"
+              >
+                <option value="todas">Todas as Lanchonetes</option>
+                {lanchonetes.map((lanch) => (
+                  <option key={lanch.id_lanchonete} value={lanch.id_lanchonete}>
+                    {lanch.nome_lanchonete}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Botões de Filtro por Status */}
           <div className="flex justify-center gap-4 mb-8">
             <button
               onClick={() => setFiltroAtivo('todos')}
