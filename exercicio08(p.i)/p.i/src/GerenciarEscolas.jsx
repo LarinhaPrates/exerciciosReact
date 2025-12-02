@@ -141,10 +141,11 @@ function GerenciarEscolas() {
         </div>
         
         <nav className="flex gap-8">
-          <Link to="/GerenciarEscolas" className="hover:underline ">ESCOLA</Link>
-          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
-          <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
-          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+                    <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

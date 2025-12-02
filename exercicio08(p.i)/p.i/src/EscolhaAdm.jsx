@@ -5,9 +5,11 @@ import { supabase } from '../lib/supabase';
 import senacBranco from './Image/senacBranco.png';
 import sescBranco from './Image/sescBranco.png';
 import cafeImg from "./Image/croisant.png";
+import { useToast } from './ToastContext';
 
 function EscolhaAdm() {
     const navigate = useNavigate();
+    const toast = useToast();
     const [saindo, setSaindo] = useState(false);
     const [userNome, setUserNome] = useState('');
     const [carregandoNome, setCarregandoNome] = useState(true);
@@ -50,13 +52,13 @@ function EscolhaAdm() {
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Erro ao deslogar:', error.message);
-                alert('Erro ao sair. Tente novamente.');
+                toast.error('Erro ao sair. Tente novamente.');
             } else {
                 navigate('/'); // Volta para App.jsx (rota raiz)
             }
         } catch (e) {
             console.error('Exceção no logout:', e);
-            alert('Erro inesperado ao sair.');
+            toast.error('Erro inesperado ao sair.');
         } finally {
             setSaindo(false);
         }

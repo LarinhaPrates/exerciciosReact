@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
+import { useToast } from './ToastContext';
 
 function CadastrarAdm() {
   const navigate = useNavigate();
+  const toast = useToast();
   // Estado do formulário (mantém nomes consistentes com os inputs)
   const [formData, setFormData] = useState({
     nomeCompleto: '',
@@ -83,11 +85,11 @@ function CadastrarAdm() {
 
     // Validações básicas (usar nomes corretos)
     if (!formData.nomeCompleto || !formData.email || !formData.senha || !formData.confirmarSenha || !formData.escolaVinculada) {
-      alert('Por favor, preencha todos os campos!');
+      toast.warning('Por favor, preencha todos os campos!');
       return;
     }
     if (formData.senha !== formData.confirmarSenha) {
-      alert('As senhas não coincidem!');
+      toast.error('As senhas não coincidem!');
       return;
     }
 
@@ -123,7 +125,7 @@ function CadastrarAdm() {
         throw new Error(`Erro ao inserir perfil: ${perfilError.message}`);
       }
 
-      alert('Administrador cadastrado com sucesso!');
+      toast.success('Administrador cadastrado com sucesso!');
       // Reset
       setFormData({
         nomeCompleto: '',
@@ -135,7 +137,7 @@ function CadastrarAdm() {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -159,10 +161,11 @@ function CadastrarAdm() {
         </div>
         
         <nav className="flex gap-8">
-          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
-          <Link to="/GerenciarAdm" className="hover:underline ">ADMINISTRADOR</Link>
-          <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
-          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+                    <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

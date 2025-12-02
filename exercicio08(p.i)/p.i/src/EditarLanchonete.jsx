@@ -4,9 +4,11 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
+import { useToast } from './ToastContext';
 
 function EditarLanchonete() {
   const { id } = useParams(); // id ou id_lanchonete
+  const toast = useToast();
   const [formData, setFormData] = useState({
     nomeLanchonete: '',
     escolaVinculada: '', // id_escola
@@ -131,9 +133,9 @@ function EditarLanchonete() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting || carregandoLanchonete) return;
-    if (!id) { alert('ID inválido.'); return; }
+    if (!id) { toast.error('ID inválido.'); return; }
     if (!formData.nomeLanchonete || !formData.escolaVinculada || !formData.administradorResponsavel) {
-      alert('Por favor, preencha nome, escola e administrador.');
+      toast.warning('Por favor, preencha nome, escola e administrador.');
       return;
     }
     setSubmitting(true);
@@ -159,11 +161,11 @@ function EditarLanchonete() {
           .eq('id', id));
       }
       if (updateError) throw new Error(updateError.message);
-      alert('Lanchonete atualizada com sucesso!');
+      toast.success('Lanchonete atualizada com sucesso!');
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
-      alert(`Erro ao atualizar lanchonete: ${err.message}`);
+      toast.error(`Erro ao atualizar lanchonete: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
@@ -188,10 +190,11 @@ function EditarLanchonete() {
         </div>
         
         <nav className="flex gap-8">
-          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
-          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
-          <Link to="/GerenciarLanchonete" className="hover:underline ">LANCHONETES</Link>
-          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+                    <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

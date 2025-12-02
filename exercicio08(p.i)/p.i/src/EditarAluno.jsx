@@ -4,9 +4,11 @@ import { useParams } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
+import { useToast } from './ToastContext';
 
 function EditarAluno() {
     const { id } = useParams(); // id_user do aluno
+    const toast = useToast();
 
     const [formData, setFormData] = useState({
         nomeCompleto: '',
@@ -99,9 +101,9 @@ function EditarAluno() {
     const handleSubmit = async e => {
         e.preventDefault();
         if (submitting) return;
-        if (!id) { alert('ID inválido para edição.'); return; }
+        if (!id) { toast.error('ID inválido para edição.'); return; }
         if (!formData.nomeCompleto || !formData.email || !formData.escolaVinculada) {
-            alert('Preencha nome, email e escola.');
+            toast.warning('Preencha nome, email e escola.');
             return;
         }
         setSubmitting(true);
@@ -115,11 +117,11 @@ function EditarAluno() {
                 })
                 .eq('id_user', id);
             if (updateError) throw new Error(updateError.message);
-            alert('Aluno atualizado com sucesso!');
+            toast.success('Aluno atualizado com sucesso!');
         } catch (err) {
             // eslint-disable-next-line no-console
             console.error(err);
-            alert(`Erro: ${err.message}`);
+            toast.error(`Erro: ${err.message}`);
         } finally {
             setSubmitting(false);
         }

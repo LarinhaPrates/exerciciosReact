@@ -214,7 +214,6 @@ function GerenciarPedidos() {
         <nav className="flex gap-8">
           <Link to="/EscolhaAdm" className="hover:underline">ESCOLHA</Link>
           <Link to="/GerenciarPedidos" className="hover:underline">PEDIDOS</Link>
-          <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

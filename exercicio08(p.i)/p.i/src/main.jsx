@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import { CarrinhoProvider } from './CarrinhoContext.jsx'
+import { ToastProvider } from './ToastContext.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
 import Cadastrar from './Cadastrar.jsx'
@@ -36,9 +37,10 @@ import ItensPedido from './ItensPedido.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CarrinhoProvider>
-      <BrowserRouter>
-        <Routes>
+    <ToastProvider>
+      <CarrinhoProvider>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Routes>
           <Route path="/" element={<App />} />
           <Route path="/Cadastrar" element={<Cadastrar />} />
           <Route path="/EsqueceuSenha" element={<EsqueceuSenha />} />
@@ -74,8 +76,9 @@ createRoot(document.getElementById('root')).render(
           <Route path="/GerenciarAlunos" element={<GerenciarAlunos />} />
           <Route path="/EditarAluno/:id" element={<EditarAluno />} />
           <Route path="/ItensPedido/:id" element={<ItensPedido />} />
-        </Routes>
-      </BrowserRouter>
-    </CarrinhoProvider>
+          </Routes>
+        </BrowserRouter>
+      </CarrinhoProvider>
+    </ToastProvider>
   </StrictMode>
 )

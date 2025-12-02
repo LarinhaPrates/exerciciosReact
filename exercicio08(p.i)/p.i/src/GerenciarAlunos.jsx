@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
+import { useToast } from './ToastContext';
 
 function GerenciarAlunos() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [alunos, setAlunos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
@@ -28,17 +30,17 @@ function GerenciarAlunos() {
         } else {
           const perfis = data || [];
           const userIds = perfis.map((p) => p.id_user).filter(Boolean);
-          
+
           // Buscar nomes das escolas
           const escolaIds = [...new Set(perfis.map(p => p.id_escola).filter(Boolean))];
           let escolasMap = {};
-          
+
           if (escolaIds.length > 0) {
             const { data: escolasData } = await supabase
               .from('escola')
               .select('id_escola, nome_escola')
               .in('id_escola', escolaIds);
-            
+
             if (escolasData) {
               escolasData.forEach(escola => {
                 escolasMap[escola.id_escola] = escola.nome_escola;
@@ -170,7 +172,7 @@ function GerenciarAlunos() {
 
       // Remover da UI após sucesso
       setAlunos((prev) => prev.filter((a) => a.id !== id));
-      alert('Aluno excluído com sucesso!');
+      toast.success('Aluno excluído com sucesso!');
     } catch (ex) {
       console.error('Exceção ao excluir aluno:', ex);
       setErro('Erro inesperado ao tentar excluir aluno.');
@@ -180,19 +182,21 @@ function GerenciarAlunos() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-  <header className="bg-[#004d9d] text-white app-header">
+      <header className="bg-[#004d9d] text-white app-header">
         <div className="flex items-center gap-4">
           <div className="border-2 border-white rounded-full p-2 w-12 h-12 flex items-center justify-center">
             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
             </svg>
           </div>
           <span className="font-semibold">{usuarioNome || 'USUÁRIO'}</span>
         </div>
-        
+
         <nav className="flex gap-8">
-          <Link to="/EscolhaAdm" className="hover:underline">ESCOLHA</Link>
-          <Link to="/GerenciarPedidos" className="hover:underline">PEDIDOS</Link>
+          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+          <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
           <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
@@ -234,16 +238,15 @@ function GerenciarAlunos() {
                   </tr>
                 )}
                 {alunos.map((aluno, index) => (
-                  <tr 
-                    key={aluno.id} 
+                  <tr
+                    key={aluno.id}
                     className={`border-b-2 border-[#004d9d] ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                   >
                     <td className="py-4 px-6 text-gray-800">{aluno.nome}</td>
                     <td className="py-4 px-6 text-gray-800 border-l-2 border-[#004d9d]">{aluno.escola}</td>
                     <td className="py-4 px-6 text-gray-800 border-l-2 border-[#004d9d]">{aluno.pedidosFeitos}</td>
-                    <td className={`py-4 px-6 border-l-2 border-[#004d9d] ${
-                      aluno.status === 'Ativo' ? 'text-green-600' : 'text-red-600'
-                    } font-semibold`}>
+                    <td className={`py-4 px-6 border-l-2 border-[#004d9d] ${aluno.status === 'Ativo' ? 'text-green-600' : 'text-red-600'
+                      } font-semibold`}>
                       {aluno.status}
                     </td>
                     <td className="py-4 px-6 border-l-2 border-[#004d9d]">

@@ -4,9 +4,11 @@ import { useParams } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
+import { useToast } from './ToastContext';
 
 function EditarAdm() {
     const { id } = useParams(); // id_user do administrador
+    const toast = useToast();
 
     const [formData, setFormData] = useState({
         nomeCompleto: '',
@@ -93,9 +95,9 @@ function EditarAdm() {
     const handleSubmit = async e => {
         e.preventDefault();
         if (submitting) return;
-        if (!id) { alert('ID inválido para edição.'); return; }
+        if (!id) { toast.error('ID inválido para edição.'); return; }
         if (!formData.nomeCompleto || !formData.email || !formData.escolaVinculada) {
-            alert('Preencha nome, email e escola.');
+            toast.warning('Preencha nome, email e escola.');
             return;
         }
         setSubmitting(true);
@@ -109,11 +111,11 @@ function EditarAdm() {
                 })
                 .eq('id_user', id);
             if (updateError) throw new Error(updateError.message);
-            alert('Administrador atualizado com sucesso!');
+            toast.success('Administrador atualizado com sucesso!');
         } catch (err) {
             // eslint-disable-next-line no-console
             console.error(err);
-            alert(`Erro: ${err.message}`);
+            toast.error(`Erro: ${err.message}`);
         } finally {
             setSubmitting(false);
         }
@@ -134,9 +136,10 @@ function EditarAdm() {
                 </div>
                 <nav className="flex gap-8">
                     <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
-                    <Link to="/GerenciarAdm" className="hover:underline ">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
                     <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
                     <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
                 </nav>
                 <div className="flex gap-4">
                     <img src={senac} alt="Senac" className="h-8" />

@@ -106,7 +106,6 @@ function GerenciarProdutos() {
                 <nav className="flex gap-8">
                     <Link to="/GerenciarProdutosSenac" className="hover:underline">PRODUTOS</Link>
                     <Link to="/GerenciarPedidos" className="hover:underline">PEDIDOS</Link>
-                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
                 </nav>
 
                 <div className="flex gap-4">

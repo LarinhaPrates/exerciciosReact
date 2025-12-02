@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
+import { useToast } from './ToastContext';
 
 function GerenciarAdm() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [administradores, setAdministradores] = useState([]); // carregados da tabela perfil
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
@@ -100,12 +102,12 @@ function GerenciarAdm() {
       .eq('tipoConta', 'adm')
       .select('id_user'); // retorna linhas afetadas para checar se algo foi apagado
     if (error) {
-      alert(`Erro ao excluir: ${error.message}`);
+      toast.error(`Erro ao excluir: ${error.message}`);
       setDeletingId(null);
       return;
     }
     if (!deletedRows || deletedRows.length === 0) {
-      alert('Nenhuma linha foi excluída. Verifique permissões (RLS) ou se o registro existe.');
+      toast.warning('Nenhuma linha foi excluída. Verifique permissões (RLS) ou se o registro existe.');
       // Recarrega lista para garantir sincronização
       await carregarAdmins();
       setDeletingId(null);
@@ -114,7 +116,7 @@ function GerenciarAdm() {
     // Recarrega a lista a partir do backend para evitar divergência
     await carregarAdmins();
     setDeletingId(null);
-    alert('Administrador excluído com sucesso!');
+    toast.success('Administrador excluído com sucesso!');
   };
 
   const handleCadastrar = () => {
@@ -135,10 +137,11 @@ function GerenciarAdm() {
         </div>
         
         <nav className="flex gap-8">
-          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
-          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
-          <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
-          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+                    <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">

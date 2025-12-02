@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
+import { useToast } from './ToastContext';
 
 function GerenciarLanchonete() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [lanchonetes, setLanchonetes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
@@ -93,10 +95,11 @@ function GerenciarLanchonete() {
       if (error) throw new Error(error.message);
       // Remover da lista após sucesso
       setLanchonetes(prev => prev.filter(item => (item.id_lanchonete ?? item.id) !== id));
+      toast.success('Lanchonete excluída com sucesso!');
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
-      alert(`Erro ao excluir: ${err.message}`);
+      toast.error(`Erro ao excluir: ${err.message}`);
     } finally {
       setDeletingId(null);
     }
@@ -120,10 +123,11 @@ function GerenciarLanchonete() {
         </div>
         
         <nav className="flex gap-8">
-          <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
-          <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
-          <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
-          <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarEscolas" className="hover:underline">ESCOLA</Link>
+                    <Link to="/GerenciarAdm" className="hover:underline">ADMINISTRADOR</Link>
+                    <Link to="/GerenciarLanchonete" className="hover:underline">LANCHONETES</Link>
+                    <Link to="/RelatoriosGerais" className="hover:underline">RELATÓRIOS</Link>
+                    <Link to="/GerenciarAlunos" className="hover:underline">ALUNOS</Link>
         </nav>
 
         <div className="flex gap-4">
