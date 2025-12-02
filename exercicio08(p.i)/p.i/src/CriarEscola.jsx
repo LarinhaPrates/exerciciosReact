@@ -1,10 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase.js';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 
 function CriarEscola() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nomeEscola: '',
     cidade: '',
@@ -151,13 +152,7 @@ function CriarEscola() {
   };
 
   const handleCancel = () => {
-    setFormData({
-      nomeEscola: '',
-      cidade: '',
-      administradorResponsavel: ''
-    });
-    // Opcional: redirecionar para outra página
-    // window.location.href = '/Escolhe';
+    navigate('/GerenciarEscolas');
   };
 
   return (

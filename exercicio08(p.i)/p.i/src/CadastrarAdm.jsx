@@ -1,10 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 import { supabase } from '../lib/supabase';
 
 function CadastrarAdm() {
+  const navigate = useNavigate();
   // Estado do formulário (mantém nomes consistentes com os inputs)
   const [formData, setFormData] = useState({
     nomeCompleto: '',
@@ -141,13 +142,7 @@ function CadastrarAdm() {
   };
 
   const handleCancel = () => {
-    setFormData({
-      nomeCompleto: '',
-      email: '',
-      senha: '',
-      confirmarSenha: '',
-      escolaVinculada: ''
-    });
+    navigate('/GerenciarAdm');
   };
 
   return (

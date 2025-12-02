@@ -1,10 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import senac from './Image/senacBranco.png';
 import sesc from './Image/sescBranco.png';
 
 function GerenciarLanchonete() {
+  const navigate = useNavigate();
   const [lanchonetes, setLanchonetes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
@@ -72,8 +73,7 @@ function GerenciarLanchonete() {
   }, []);
 
   const handleEdit = (id) => {
-    // Navega para página de edição com o ID
-    window.location.href = `/EditarLanchonete/${id}`;
+    navigate(`/EditarLanchonete/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -103,7 +103,7 @@ function GerenciarLanchonete() {
   };
 
   const handleCriarLanchonete = () => {
-    window.location.href = '/CriarLanchonete';
+    navigate('/CriarLanchonete');
   };
 
   return (
